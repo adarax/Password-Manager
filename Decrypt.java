@@ -2,53 +2,36 @@ package passwordManager;
 
 public class Decrypt {
 
+	// Instructions:
+
+	// Remove Ca$h from beginning of string, Cow from end
+	// Reverse
+	// Decrypt from ROT-47
+	// ASCII values are kept between 32 and 126
+	
 	public static String decryptData(String encryptedText) {
 		
-		String encrypted = encryptedText.substring(4, (encryptedText.length() - 3));
+		String trimmed = encryptedText.substring(4, encryptedText.length() - 3);
+		String reversed = "";
+		
+		for (int i = 0; i < trimmed.length(); i++) {
+			reversed = trimmed.charAt(i) + reversed;
+		}
+		
 		String decrypted = "";
-		char currentChar;
 		
-		for (int i = 0; i < encrypted.length(); i++) {
-			
-			currentChar = encrypted.charAt(i);
-			
-			String symbols = "`~!@#$%^&*()-_=+[]{}\\|:;\"'<>,./?";
+		for (int i = 0; i < reversed.length(); i++) {
+			char currentChar = reversed.charAt(i);
 
-			// confuses letters from numbers... FIX THIS
+			int ascii = (int) currentChar;
+			ascii -= 47;
 
-			if (Character.isLetter((char)((int)currentChar + 17))) {
-				decrypted += (char)((int)currentChar + 17);
-				continue;
-			}
-			else if (Character.isDigit((char)(int)currentChar - 24)) {
-				decrypted += (char)((int)currentChar - 24);
-				continue;
-			}
-			else if (symbols.indexOf(currentChar) > -1) {
-				
-				if (Character.isLetter(currentChar)) {
-					decrypted += (char)((int)currentChar + 17);
-					continue;
-				} else if (Character.isDigit(currentChar)) {
-					decrypted += (char)((int)(currentChar) - 24);
-					continue;
-				} else {
-					decrypted += currentChar;
-				}
-				
-			}
+			if (ascii < 32)
+				ascii = (ascii + 126) - 32;
 			
+			decrypted += (char) ascii;
 		}
 		
-		// Reverse back to normal
-		
-		String result = "";
-		
-		for (int i = 0; i < decrypted.length(); i++) {
-			result = decrypted.charAt(i) + result;
-		}
-		
-		return result;
-		
+		return decrypted;
 	}
 }
