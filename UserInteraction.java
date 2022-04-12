@@ -1,3 +1,5 @@
+package passwordManager;
+
 public abstract class UserInteraction {
 
     // May need to change access modifiers / static modifier
@@ -22,8 +24,13 @@ public abstract class UserInteraction {
     * Verification of proper input will be based on type of task
     * Might need multiple functions or generic
     */
-    public <T> T verifyInput(String input, String type) { // May need to modify declaration
+    public <T> T handleInput(T input, String type) { // May need to modify declaration
 
+    	switch (type) {
+    		case "password":
+    		
+    	}
+    	
         // If type is pw, go based on password rules, return String cuz pw
         // If input is supposed to be a number, make sure it is and return int
         // Etc.
@@ -33,7 +40,37 @@ public abstract class UserInteraction {
  
         return null;
     }
+    
+    public void clearScreen() {
+    	// Clear command line screen
+    }
+    
+    public abstract void displayCredentials(Account acc, String friendlyName); // friendlyName acts as key for hashmap
+    																		  // It's the name of the credential set requested
+    																		  // friendlyName should get passed from listStoredUserData()
 
-    // Other methods needed    
+    // Gets hashmap of friendly names
+    // Lists friendly names (display hashmap keys)
+    // Returns friendlyName that user selects, to be displayed using displayCredentials
+    
+    // Eventually instead of using userId, may want to use the Account object
+    // Will need a method that takes userId and return Account (after giving password) -> 
+    public abstract String listStoredUserData(int userId);
+    
+    
+    // Set username
+    // Set name
+    // Set password
+    public void signInProcedures() {
+    	
+    }
+    
+    // Exit message
+    // Called when user selects exit option
+    // Terminates program
+    public void signOut() {
+    	
+    }
+    
 
 }
