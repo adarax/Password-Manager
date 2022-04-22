@@ -1,24 +1,19 @@
 package passwordManager;
 
-import java.util.Scanner;
-
 public class Main {
 
 	public static void main(String[] args) {
 		
-		// Testing encrypt / decrypt
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Enter something to encrypt: ");
-		String enc = Encrypt.encryptData(sc.nextLine());
-		sc.close();
 		
-		System.out.println("Encrypted: " + enc);
-		System.out.println("Decrypted: " + Decrypt.decryptData(enc));
-		//
+//		UserInputManager inpmngr = new UserInputManager();
+//		inpmngr.start();
+		
+//		DataManager.readAccountData();
 
-		// Database.makeFile();
-		// DataManager.readFile();
-
+		// Next step:
+		// continue database --> work on readAccountData() method
+		//					 --> work on makeCredentialsFile() method (in DataManager)
+		
 	}
 
 }

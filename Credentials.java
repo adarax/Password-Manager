@@ -38,9 +38,7 @@ public class Credentials {
 
 	@Override
 	public String toString() {
-		return "Friendly name=" + this.friendlyName + " Username=" + this.username + " Password=" + this.password;
+		return "-" + this.friendlyName + " : " + this.username + " " + this.password;
 	}
-	
-	
 	
 }

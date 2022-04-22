@@ -1,12 +1,12 @@
 package passwordManager;
 
-public class Encrypt {
+public class Encrypt extends DataManager {
 
 	// Instructions:
 
 	// Encrypting using ROT-47
 	// Reverse
-	// Add Ca$h before, Cow after
+	// Add Ha$h before, Cow after
 	// ASCII values are kept between 32 and 126
 
 	public static String encryptData(String plainText) {
@@ -31,7 +31,7 @@ public class Encrypt {
 			reversed = encrypted.charAt(i) + reversed;
 		}
 
-		return "Ca$h" + reversed + "Cow";
+		return "Ha$h" + reversed + "Cow";
 	}
 
 }

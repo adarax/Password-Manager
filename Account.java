@@ -1,18 +1,33 @@
 package passwordManager;
 
-public class Account {
+import java.util.ArrayList;
+import java.util.Random;
+
+public class Account implements IAccount {
+
+	private int userId;
+	private static String name; // Static so that it can retrieved by UserInputManager in greetings
+								// without creating an instance variable
+								// May need to modify eventually, just make a static variable of the Account in use for this session
+	private String password;
+	private ArrayList<Integer> existingUserIds;
 	
-	int userId;
-	String name;
-	String password;
 	
-	// User id will be auto generated, and associated with a password
-	// Name is just the name the user wants to be called
-	// Password will be encrypted before being passed into the constructor
+	// ******** Another variable: *********
+	// The HashMap of passwords corresponding to the Account (will be instantiated
+	// by a method in DataManager)
+	public Account(String name, String password) {
+		Account.name = name;
+		this.password = password;
+		this.existingUserIds = DataManager.createAndUpdateIdList();
+		this.userId = generateUserId();
+	}
+	
 	public Account(int userId, String name, String password) {
 		this.userId = userId;
-		this.name = name;
+		Account.name = name;
 		this.password = password;
+		this.existingUserIds = DataManager.createAndUpdateIdList();
 	}
 
 	public int getUserId() {
@@ -23,12 +38,12 @@ public class Account {
 		this.userId = userId;
 	}
 
-	public String getName() {
-		return name;
+	public static String getName() {
+		return Decrypt.decryptData(Account.name);
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		Account.name = Encrypt.encryptData(name);
 	}
 
 	public String getPassword() {
@@ -38,10 +53,31 @@ public class Account {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	@Override
-	public String toString() { // This will be passed into the Accounts database, and to get each use substring
-		return "UserId=" + this.userId + " Name=" + this.name + " Password=" + this.password;
+
+	public ArrayList<Integer> getExistingUserIds() {
+		return existingUserIds;
 	}
-	
+
+	public void setExistingUserIds(ArrayList<Integer> existingUserIds) {
+		this.existingUserIds = existingUserIds;
+	}
+
+	public int generateUserId() {
+		Random r = new Random();
+		int generatedId = r.nextInt(99999);
+
+		if (!existingUserIds.contains(generatedId) && generatedId >= 10000) {
+			DataManager.addUsedUserId(generatedId);
+			return generatedId;
+		} else {
+			return generateUserId();
+		}
+
+	}
+
+	@Override
+	public String toString() { // This will be passed into the Accounts database
+		return "UserId=" + this.userId + " Name=" + Account.name + " Password=" + this.password;
+	}
+
 }

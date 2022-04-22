@@ -1,10 +1,10 @@
 package passwordManager;
 
-public class Decrypt {
+public class Decrypt extends DataManager {
 
 	// Instructions:
 
-	// Remove Ca$h from beginning of string, Cow from end
+	// Remove Ha$h from beginning of string, Cow from end
 	// Reverse
 	// Decrypt from ROT-47
 	// ASCII values are kept between 32 and 126
