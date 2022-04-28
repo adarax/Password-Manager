@@ -13,9 +13,6 @@ public class Main {
 		- clearScreen()
 		- formalize comments everywhere
 		 */
-		
-		
-		// ASK ABOUT CONSTRUCTORS. DO WE PUT THEM EVEN IF THEY WON'T GET USED? (objects of those classes wont be created)
 	}
 
 }
