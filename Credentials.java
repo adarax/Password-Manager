@@ -2,14 +2,14 @@ package passwordManager;
 
 public class Credentials {
 	
-	String friendlyName;
-	String username;
-	String password;
+	private String friendlyName;
+	private String username;
+	private String password;
 	
 	public Credentials(String friendlyName, String username, String password) {
 		this.friendlyName = friendlyName;
 		this.username = username;
-		this.password = password; // Encrypted before put here
+		this.password = password;
 	}
 
 	public String getFriendlyName() {

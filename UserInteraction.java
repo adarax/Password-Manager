@@ -1,15 +1,16 @@
 package passwordManager;
 
-public abstract class UserInteraction {
+public abstract class UserInteraction extends DataManager {
 
     // May need to change access modifiers / static modifier
-    
+	
     /*
     * Beings interaction with user
     * First thing to appear on screen
-    * Includes greeting, and asks user to set up account
+    * Includes greeting if the sign-in menu is being called for the first time
+    * Asks user to set up account
     */
-    public abstract void start();
+    public abstract void start(boolean greet);
     
     /*
      * Creates user account
@@ -23,8 +24,9 @@ public abstract class UserInteraction {
     */
     public abstract void taskMenu();
     
-    // Clear command line screen (only works on CMD)
-    public void clearScreen() {
+    // Clear command line screen
+    /** TODO */
+    public final void clearScreen() {
     	
     	// Finish other things first, requires some research
     	
@@ -33,7 +35,7 @@ public abstract class UserInteraction {
     // friendlyName acts as key for hashmap
 	// It's the name of the credential set requested
 	// friendlyName should get passed from listStoredUserData()
-    public abstract void displayCredentials(Account acc, String friendlyName); 
+    public abstract void displayCredentials(String friendlyName); 
 
     // Gets hashmap of friendly names
     // Lists friendly names (display hashmap keys)
@@ -43,13 +45,10 @@ public abstract class UserInteraction {
     // Will need a method that takes userId and return Account (after giving password)
     public abstract String listStoredUserData(int userId);
     
-    
-    // Set username
-    // Set name
-    // Set password
-    public void signInProcedures() {
-    	
-    }
+    /*
+     * Handles sign-in to the user's account
+     */
+    public abstract void signInProcedures();
     
     /*
      * Handles creation of credential set
@@ -60,5 +59,4 @@ public abstract class UserInteraction {
      * Handles exceptions that may arise while inputting into int-only fields
      */
     public abstract int handleIntInput();
-    
 }

@@ -4,179 +4,162 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.HashMap;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+import java.util.Set;
 
-public class DataManager {
-
-	// Static dynamic start to path of downloads folder (then add on the specific
-	// .txt)
-
-	// Database for user accounts themselves (and passwords that are linked to it),
-	// not the credentials
-
+public class DataManager implements IDataManager {
 	/*
-	 * Database for Account data: (separate from UsedIds for simplicity)
-	 *
-	 * Reader method:
-	 * 
-	 * Add these to the corresponding variables of an Account object upon sign in
-	 * (not pw tho) For sign-in, test what the user wrote for the password against
-	 * the password stored (will have already taken in the ID and checked for
-	 * existence, so we can know the password)
-	 * 
-	 * @return Account so that it can be used as a variable inside of
-	 * UserInputManager as to not make everything static
-	 * 
-	 * Writer method:
-	 * 
-	 * Uses toString() from Account
-	 * 
-	 * Format:
-	 * { 
-	 * toString() from Account 
-	 * }
-	 * 
+	 * Finds Downloads directory
 	 */
+	private static final String DOWNLOADS_PATH = Paths.get(System.getProperty("user.home"), "Downloads").toString();
+
+	private int signedInUser;
+	private HashMap<Integer, Account> existingAccounts;
+	private HashMap<Integer, HashMap<String, String>> existingCredentials;
+	private static ArrayList<Integer> existingUserIds;
+
+	// Getters & setters
 	
-	public static void readAccountData() { // return something? put it in Accounts or UserInputManager for reference?
-		String path = "C:/Users/adam8/Downloads/userAccounts.txt";
-		File accountDataFile = new File(path);
-		Scanner sc;
-		HashMap<Integer, Account> accountMap = new HashMap<Integer, Account>();
+	public final int getSignedInUser() {
+		return signedInUser;
+	}
+
+	public final void setSignedInUser(int signedInUser) {
+		this.signedInUser = signedInUser;
+	}
+
+	public final HashMap<Integer, Account> getExistingAccounts() {
+		return existingAccounts;
+	}
+
+	public final void setExistingAccounts(HashMap<Integer, Account> existingAccounts) {
+		this.existingAccounts = existingAccounts;
+	}
+
+	public final HashMap<Integer, HashMap<String, String>> getExistingCredentials() {
+		return existingCredentials;
+	}
+
+	public final void setExistingCredentials(HashMap<Integer, HashMap<String, String>> existingCredentials) {
+		this.existingCredentials = existingCredentials;
+	}
+
+	public final static ArrayList<Integer> getExistingUserIds() {
+		return existingUserIds;
+	}
+
+	public final static void setExistingUserIds(ArrayList<Integer> existingUserIds) {
+		DataManager.existingUserIds = existingUserIds;
+	}
+	
+	// Methods
+
+	public final void readAccountData() {
+		HashMap<Integer, Account> accountMap = new HashMap<>();
+		String path = DOWNLOADS_PATH + "/userAccounts.txt";
+		String currentLine, name, password;
+		int userId;
+
 		try {
-			sc = new Scanner(accountDataFile);
-			String currentLine, name, password;
-			int userId;
-			
+			File accountDataFile = new File(path);
+			Scanner sc = new Scanner(accountDataFile);
+
 			while (sc.hasNextLine()) {
 				currentLine = sc.nextLine();
-				int indexOfFirstSpace = currentLine.indexOf(" "),
-						indexOfLastSpace = currentLine.lastIndexOf(" ");
+				int indexOfFirstSpace = currentLine.indexOf(" "), indexOfLastSpace = currentLine.lastIndexOf(" ");
 				if (currentLine.charAt(0) == '{' || currentLine.charAt(0) == '}') {
 					continue;
-				}
-				else if (currentLine.length() > 1) {
+				} else if (currentLine.length() > 1) {
 					userId = Integer.parseInt(currentLine.substring(7, indexOfFirstSpace));
 					name = currentLine.substring(indexOfFirstSpace + 6, indexOfLastSpace);
 					password = currentLine.substring(indexOfLastSpace + 10);
 					accountMap.put(userId, new Account(userId, name, password));
-				}
-				else {
+				} else {
 					sc.close();
-					break; // for potential trailing " " at end of file
+					break;
 				}
 			}
-		}
-		catch (FileNotFoundException e) {
+			// TODO:
+			// sort accountMap by user Id (as per interface)
+			setExistingAccounts(accountMap);
+			retrieveAndSetUsedIds();
+			
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void writeAccountData(Account acc) {
+	public final void writeAccountData(Account acc) {
 		try {
-			FileWriter writer = new FileWriter("C:/Users/adam8/Downloads/userAccounts.txt", true);
+			FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/userAccounts.txt", true);
 			writer.append("{\n" + acc.toString() + "\n}\n");
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
-	/*
-	 * Creates and updates used user ID ArrayList Returns ArrayList<Integer> used in Account class
-	 * @return ArrayList<Integer>
-	 */
-	public static ArrayList<Integer> createAndUpdateIdList() {
-		String path = "C:/Users/adam8/Downloads/usedIds.txt";
-		File userAccountsFile = new File(path);
-
-		if (!userAccountsFile.exists()) {
-			try {
-				userAccountsFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Scanner sc;
-		try {
-			sc = new Scanner(userAccountsFile);
-			if (sc.hasNextLine()) {
-				String usedIds = sc.nextLine();
-				sc.close();
-
-				ArrayList<Integer> usedIdsList = new ArrayList<>();
-				String currentId = "";
 	
-				for (int i = 0; i < usedIds.length(); i++) {
-					if (usedIds.charAt(i) != ',') {
-						currentId += usedIds.charAt(i);
-					} else {
-						usedIdsList.add(Integer.parseInt(currentId));
-						currentId = "";
-					}
-				}
-				return usedIdsList;
+	public final void addCredentialSetToDB(int userId, Credentials credentialSet) {
+
+		File credentialsFile = new File(DOWNLOADS_PATH + "/credentials.txt");
+		String entireFile = "";
+
+		try {
+			if (!credentialsFile.exists()) {
+				credentialsFile.createNewFile();
 			}
-		} catch (FileNotFoundException e) {
+			Scanner sc = new Scanner(credentialsFile);
+
+			while (sc.hasNextLine()) {
+				entireFile += sc.nextLine();
+				entireFile += "\n";
+			}
+			sc.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return new ArrayList<>();
-	}
+		// Eventually switch to a Search algo (based on instructions)
+		if (entireFile.contains("+" + Integer.toString(userId))) {
+			for (int i = 0; i < entireFile.length(); i++) {
+				// If ID is on DB
+				if (entireFile.substring(i, i + 1).equals("+")
+						&& entireFile.substring(i + 1, i + 6).equals(Integer.toString(userId))) {
 
-	/*
-	 * Adds used user ID to database
-	 */
-	public static void addUsedUserId(int userId) {
+					i += 7; // to skip over user id line
+
+					entireFile = entireFile.substring(0, i + 2) + credentialSet.toString()
+							+ entireFile.substring(i + 1);
+					break;
+				}
+			}
+		} else {
+			// If not on DB: (adds userId entry)
+			entireFile += "nextUser\n+" + Integer.toString(userId) + "\n{\n" + credentialSet.toString() + "\n}";
+		}
+		// Write back to file
 		try {
-			FileWriter writer = new FileWriter("C:/Users/adam8/Downloads/usedIds.txt", true);
-			writer.append(userId + ",");
+			FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/credentials.txt");
+			writer.write(entireFile);
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*
-	 * Creates credentials database if it doesn't already exist
-	 * Writes to credentials database based on parameters
-	 */
-	public static void addCredentialSetToDB(int userId, Credentials credentialSet) { // FINISH
+	public final void readCredentialsFile() {
 
-		// For path, get java to search for downloads folder in the OS (dynamic)
-
-		File credentialsFile = new File("C:/Users/adam8/Downloads/credentials.txt");
-
-		if (!credentialsFile.exists()) {
-			try {
-				credentialsFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// Plan:
-		
-		// Write in databse format (as discussed)
-		// Be able to append data (provided in parameters) under a given userId (provided in parameters)
-		// If that userId does not already have a spot on the DB, one must be made
-		// Otherwise, append to the existing spot
-	}
-
-	public static HashMap<Integer, HashMap<String, String>> readCredentialsFile() {
-
-		// For path, get java to search for downloads folder in the OS
-		File path = new File("C:/Users/adam8/Downloads/credentials.txt"); // Change at the end
-		HashMap<Integer, HashMap<String, String>> userIdHashMap = new HashMap<Integer, HashMap<String, String>>();
-		Scanner sc;
-		String currentLine, username, password, friendlyName;
-		int userId = 0, indexOfFirstSpace, indexOfLastSpace;
-		HashMap<String, String> credentials;
+		HashMap<Integer, HashMap<String, String>> credentialsMap = new HashMap<Integer, HashMap<String, String>>();
 
 		try {
+			File path = new File(DOWNLOADS_PATH + "/credentials.txt");
+			Scanner sc;
+			String currentLine, username, password, friendlyName;
+			int userId = 0, indexOfFirstSpace, indexOfLastSpace;
+			HashMap<String, String> credentials;
 			sc = new Scanner(path);
 			boolean done = false;
 
@@ -187,14 +170,13 @@ public class DataManager {
 					done = true;
 					continue;
 				}
-
 				while (sc.hasNextLine()) {
 					currentLine = sc.nextLine();
 
 					if (currentLine.charAt(0) == '+') {
 						userId = Integer.parseInt(currentLine.substring(1));
 					} else if (currentLine.charAt(0) == '}') {
-						userIdHashMap.put(userId, credentials);
+						credentialsMap.put(userId, credentials);
 						break;
 					} else if (currentLine.charAt(0) == '-') {
 						indexOfFirstSpace = currentLine.indexOf(" ");
@@ -205,22 +187,20 @@ public class DataManager {
 						password = currentLine.substring(indexOfLastSpace + 1);
 						credentials.put(friendlyName, username + " " + password);
 					}
-					// For case of '{', which was done for readability in the DB, do nothing
-					// "nextUser" is put at the top of each section for both readability
-					// and the fact that the check for sc.nextLine() = "" seems to make scanner
-					// skip a line and miss the userId
-					// "nextUser" acts as a placeholder
 				}
-
 			}
 			sc.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
-//		System.out.println(userIdHashMap); // Remove later
-		return userIdHashMap;
+		setExistingCredentials(credentialsMap);
 	}
 
+	public final void retrieveAndSetUsedIds() {
+		Set<Integer> idSet = getExistingAccounts().keySet();
+		ArrayList<Integer> existingIds = new ArrayList<>(idSet);
+
+		setExistingUserIds(existingIds);
+	}
 }
