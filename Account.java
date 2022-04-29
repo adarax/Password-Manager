@@ -44,7 +44,7 @@ public class Account implements IAccount {
 		this.password = password;
 	}
 
-	public int generateUserId() {
+	public final int generateUserId() {
 		Random r = new Random();
 		int generatedId = r.nextInt(99999);
 		
@@ -54,13 +54,10 @@ public class Account implements IAccount {
 		} else {
 			return generateUserId();
 		}
-
 	}
 
 	@Override
 	public String toString() {
 		return "UserId=" + this.userId + " Name=" + this.name + " Password=" + this.password;
 	}
-
-
 }

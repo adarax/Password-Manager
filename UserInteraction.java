@@ -1,15 +1,13 @@
 package passwordManager;
 
-public abstract class UserInteraction extends DataManager {
-
-    // May need to change access modifiers / static modifier
-	
-    /*
-    * Beings interaction with user
-    * First thing to appear on screen
-    * Includes greeting if the sign-in menu is being called for the first time
-    * Asks user to set up account
-    */
+public abstract class UserInteraction extends DataManager implements IUserInteraction {
+    
+	/*
+     * Beings interaction with user
+     * First thing to appear on screen
+     * Includes greeting if the sign-in menu is being called for the first time
+     * Asks user to set up account
+     */
     public abstract void start(boolean greet);
     
     /*
@@ -18,32 +16,30 @@ public abstract class UserInteraction extends DataManager {
     public abstract void createUserAccount();
     
     /*
-    * Displays task menu
-    * Uses Scanner to let user choose option
-    * Calls appropriate method
-    */
+     * Displays task menu (main menu)
+     * Uses Scanner to let user choose option
+     * Calls appropriate method
+     */
     public abstract void taskMenu();
     
-    // Clear command line screen
-    /** TODO */
-    public final void clearScreen() {
-    	
-    	// Finish other things first, requires some research
-    	
-    }
+    /*
+     * See interface IUserInteraction for description
+     */
+	public final void clearScreen() {
+		// TODO
+		// Still need to find an implementation that does not leave an unknown character behind in the IDE
+	}
     
-    // friendlyName acts as key for hashmap
-	// It's the name of the credential set requested
-	// friendlyName should get passed from listStoredUserData()
+    /*
+     * Displays all friendly names of credential sets owned by the user
+     * Asks user to select the Credentials set they would like to view
+     */
+    public abstract void listAndSelectCredentials();
+    
+    /*
+     * Displays requested credential set based on name of set (obtained by user-input)
+     */
     public abstract void displayCredentials(String friendlyName); 
-
-    // Gets hashmap of friendly names
-    // Lists friendly names (display hashmap keys)
-    // Returns friendlyName that user selects, to be displayed using displayCredentials
-    
-    // Eventually instead of using userId, may want to use the Account object
-    // Will need a method that takes userId and return Account (after giving password)
-    public abstract String listStoredUserData(int userId);
     
     /*
      * Handles sign-in to the user's account
@@ -53,10 +49,18 @@ public abstract class UserInteraction extends DataManager {
     /*
      * Handles creation of credential set
      */
-    public abstract Credentials handleCredentialSetCreation();
+    public abstract void handleCredentialSetCreation();
     
     /*
      * Handles exceptions that may arise while inputting into int-only fields
      */
     public abstract int handleIntInput();
+    
+    /*
+     * Guides user through creating a password for their account
+	 * Passwords must be:
+	 * 8 characters or longer
+	 * Only contain characters with ASCII values 33-126
+	 */
+    public abstract String handlePasswordCreation();
 }

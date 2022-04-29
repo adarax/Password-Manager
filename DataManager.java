@@ -23,35 +23,35 @@ public class DataManager implements IDataManager {
 
 	// Getters & setters
 	
-	public final int getSignedInUser() {
+	public int getSignedInUser() {
 		return signedInUser;
 	}
 
-	public final void setSignedInUser(int signedInUser) {
+	public void setSignedInUser(int signedInUser) {
 		this.signedInUser = signedInUser;
 	}
 
-	public final HashMap<Integer, Account> getExistingAccounts() {
+	public HashMap<Integer, Account> getExistingAccounts() {
 		return existingAccounts;
 	}
 
-	public final void setExistingAccounts(HashMap<Integer, Account> existingAccounts) {
+	public void setExistingAccounts(HashMap<Integer, Account> existingAccounts) {
 		this.existingAccounts = existingAccounts;
 	}
 
-	public final HashMap<Integer, HashMap<String, String>> getExistingCredentials() {
+	public HashMap<Integer, HashMap<String, String>> getExistingCredentials() {
 		return existingCredentials;
 	}
 
-	public final void setExistingCredentials(HashMap<Integer, HashMap<String, String>> existingCredentials) {
+	public void setExistingCredentials(HashMap<Integer, HashMap<String, String>> existingCredentials) {
 		this.existingCredentials = existingCredentials;
 	}
 
-	public final static ArrayList<Integer> getExistingUserIds() {
+	public static ArrayList<Integer> getExistingUserIds() {
 		return existingUserIds;
 	}
 
-	public final static void setExistingUserIds(ArrayList<Integer> existingUserIds) {
+	public static void setExistingUserIds(ArrayList<Integer> existingUserIds) {
 		DataManager.existingUserIds = existingUserIds;
 	}
 	
@@ -65,6 +65,14 @@ public class DataManager implements IDataManager {
 
 		try {
 			File accountDataFile = new File(path);
+			
+			if (!accountDataFile.exists()) {
+				try {
+					accountDataFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			Scanner sc = new Scanner(accountDataFile);
 
 			while (sc.hasNextLine()) {
@@ -108,9 +116,6 @@ public class DataManager implements IDataManager {
 		String entireFile = "";
 
 		try {
-			if (!credentialsFile.exists()) {
-				credentialsFile.createNewFile();
-			}
 			Scanner sc = new Scanner(credentialsFile);
 
 			while (sc.hasNextLine()) {
@@ -118,11 +123,11 @@ public class DataManager implements IDataManager {
 				entireFile += "\n";
 			}
 			sc.close();
-		} catch (IOException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 
-		// Eventually switch to a Search algo (based on instructions)
+		// Eventually will switch to a Search algo (based on instructions)
 		if (entireFile.contains("+" + Integer.toString(userId))) {
 			for (int i = 0; i < entireFile.length(); i++) {
 				// If ID is on DB
@@ -140,7 +145,8 @@ public class DataManager implements IDataManager {
 			// If not on DB: (adds userId entry)
 			entireFile += "nextUser\n+" + Integer.toString(userId) + "\n{\n" + credentialSet.toString() + "\n}";
 		}
-		// Write back to file
+		
+		// Writes back to file
 		try {
 			FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/credentials.txt");
 			writer.write(entireFile);
@@ -155,12 +161,20 @@ public class DataManager implements IDataManager {
 		HashMap<Integer, HashMap<String, String>> credentialsMap = new HashMap<Integer, HashMap<String, String>>();
 
 		try {
-			File path = new File(DOWNLOADS_PATH + "/credentials.txt");
+			File credentialsFile = new File(DOWNLOADS_PATH + "/credentials.txt");
+			
+			if (!credentialsFile.exists()) {
+				try {
+					credentialsFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			Scanner sc;
 			String currentLine, username, password, friendlyName;
 			int userId = 0, indexOfFirstSpace, indexOfLastSpace;
 			HashMap<String, String> credentials;
-			sc = new Scanner(path);
+			sc = new Scanner(credentialsFile);
 			boolean done = false;
 
 			while (!done) {
@@ -202,5 +216,17 @@ public class DataManager implements IDataManager {
 		ArrayList<Integer> existingIds = new ArrayList<>(idSet);
 
 		setExistingUserIds(existingIds);
+	}
+	
+	// TODO:
+	
+	public final HashMap<Integer, HashMap<String, String>> modifyCredentialSet() {
+
+		return null;
+	}
+
+	public final HashMap<Integer, HashMap<String, String>> deleteCredentialSet() {
+
+		return null;
 	}
 }

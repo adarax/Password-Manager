@@ -40,5 +40,4 @@ public class Credentials {
 	public String toString() {
 		return "-" + this.friendlyName + " : " + this.username + " " + this.password;
 	}
-	
 }

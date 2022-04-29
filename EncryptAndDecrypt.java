@@ -2,7 +2,7 @@ package passwordManager;
 
 public class EncryptAndDecrypt {
 
-	public static String encryptData(String plainText) {
+	public static final String encryptData(String plainText) {
 
 		String encrypted = "";
 
@@ -25,7 +25,7 @@ public class EncryptAndDecrypt {
 		return "Ha$h" + reversed + "Cow";
 	}
 
-	public static String decryptData(String encryptedText) {
+	public static final String decryptData(String encryptedText) {
 
 		String trimmed = encryptedText.substring(4, encryptedText.length() - 3);
 		String reversed = "";

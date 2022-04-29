@@ -3,16 +3,16 @@ package passwordManager;
 public class Main {
 
 	public static void main(String[] args) {
-	
+		
 		UserInputManager inpmngr = new UserInputManager();
 		inpmngr.start(true);
-
+		
 		/* TODO:
-		- all things that are "required" by instructions --> figure out where to use super (in the constructors)!!!
-		- modify, create, delete, view credential set (using the HashMaps)
+		- modify and delete credential sets (using the HashMaps)
+		- implement sort and search algorithms
 		- clearScreen()
-		- formalize comments everywhere
-		 */
+		*/
+		
 	}
 
 }
