@@ -4,7 +4,8 @@ public interface IDataManager {
 	/*
 	 * Retrieves data from userAccounts.txt database
 	 * Adds data to a HashMap<Integer, Account>
-	 * Sorts HashMap<Integer, Account> by increasing order of userId
+	 * Sorts HashMap<Integer, Account> by Account name (encrypted) in ascending order
+	 * and if two names are equal it will sort them by user ID in increasing order
 	 */
 	public void readAccountData();
 	
@@ -33,4 +34,6 @@ public interface IDataManager {
 	 * Account checks this ArrayList to make sure it is not generating already-used IDs
 	 */
 	public void retrieveAndSetUsedIds();
+	
+	// Add interface for modifyCredentialsSet() and deleteCredentialsSet()
 }

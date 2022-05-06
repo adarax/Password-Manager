@@ -8,5 +8,4 @@ public interface IUserInteraction {
 	 * Only works on command line, not in IDEs
 	 */
 	public void clearScreen();
-	
 }

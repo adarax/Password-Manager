@@ -6,7 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -58,7 +62,7 @@ public class DataManager implements IDataManager {
 	// Methods
 
 	public final void readAccountData() {
-		HashMap<Integer, Account> accountMap = new HashMap<>();
+		HashMap<Integer, Account> unsortedAccountMap = new HashMap<>();
 		String path = DOWNLOADS_PATH + "/userAccounts.txt";
 		String currentLine, name, password;
 		int userId;
@@ -70,7 +74,8 @@ public class DataManager implements IDataManager {
 				try {
 					accountDataFile.createNewFile();
 				} catch (IOException e) {
-					e.printStackTrace();
+					System.out.println("Accounts database could not be created."
+							+ "\nPossible fix: restart the program.");
 				}
 			}
 			Scanner sc = new Scanner(accountDataFile);
@@ -84,19 +89,49 @@ public class DataManager implements IDataManager {
 					userId = Integer.parseInt(currentLine.substring(7, indexOfFirstSpace));
 					name = currentLine.substring(indexOfFirstSpace + 6, indexOfLastSpace);
 					password = currentLine.substring(indexOfLastSpace + 10);
-					accountMap.put(userId, new Account(userId, name, password));
+					unsortedAccountMap.put(userId, new Account(userId, name, password));
 				} else {
 					sc.close();
 					break;
 				}
 			}
-			// TODO:
-			// sort accountMap by user Id (as per interface)
-			setExistingAccounts(accountMap);
-			retrieveAndSetUsedIds();
+			ArrayList<Map.Entry<Integer, Account>> listToSort = new ArrayList<>();
 			
+			for (Map.Entry<Integer, Account> entry : unsortedAccountMap.entrySet()) {
+				listToSort.add(entry);
+			}
+						
+			Comparator<Map.Entry<Integer, Account>> entryComparator = new Comparator<Map.Entry<Integer, Account>>() {
+
+				@Override
+				public int compare(Entry<Integer, Account> o1, Entry<Integer, Account> o2) {
+					int accountNameComparison = o1.getValue().getName().compareTo(o2.getValue().getName());
+
+					if (accountNameComparison != 0) {
+						return accountNameComparison;
+					} else {
+						if (o1.getKey() > o2.getKey()) {
+							return 1;
+						} else if (o1.getKey() < o2.getKey()) {
+							return -1;
+						} else {
+							return 0;
+						}
+					}
+				}
+			};
+			
+			Collections.sort(listToSort, entryComparator);
+			HashMap<Integer, Account> sortedAccountMap = new HashMap<>();
+			
+			for (int i = 0; i < listToSort.size(); i++)
+				sortedAccountMap.put(listToSort.get(i).getKey(), listToSort.get(i).getValue());
+						
+			setExistingAccounts(sortedAccountMap);
+			retrieveAndSetUsedIds();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Accounts database could not be found."
+					+ "\nPossible fix: restart the program.");
 		}
 	}
 
@@ -106,7 +141,7 @@ public class DataManager implements IDataManager {
 			writer.append("{\n" + acc.toString() + "\n}\n");
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("An issue has occured when trying to update the accounts database.");
 		}
 	}
 	
@@ -124,20 +159,16 @@ public class DataManager implements IDataManager {
 			}
 			sc.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Credentials database could not be found."
+					+ "\nPossible fix: restart the program.");
 		}
 
-		// Eventually will switch to a Search algo (based on instructions)
 		if (entireFile.contains("+" + Integer.toString(userId))) {
 			for (int i = 0; i < entireFile.length(); i++) {
 				// If ID is on DB
-				if (entireFile.substring(i, i + 1).equals("+")
-						&& entireFile.substring(i + 1, i + 6).equals(Integer.toString(userId))) {
-
+				if (entireFile.substring(i, i + 1).equals("+") && entireFile.substring(i + 1, i + 6).equals(Integer.toString(userId))) {
 					i += 7; // to skip over user id line
-
-					entireFile = entireFile.substring(0, i + 2) + credentialSet.toString()
-							+ entireFile.substring(i + 1);
+					entireFile = entireFile.substring(0, i + 2) + credentialSet.toString() + entireFile.substring(i + 1);
 					break;
 				}
 			}
@@ -146,18 +177,16 @@ public class DataManager implements IDataManager {
 			entireFile += "nextUser\n+" + Integer.toString(userId) + "\n{\n" + credentialSet.toString() + "\n}";
 		}
 		
-		// Writes back to file
-		try {
+		try { // writes to file
 			FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/credentials.txt");
 			writer.write(entireFile);
 			writer.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("An issue has occured when trying to update the credentials database.");
 		}
 	}
 
 	public final void readCredentialsFile() {
-
 		HashMap<Integer, HashMap<String, String>> credentialsMap = new HashMap<Integer, HashMap<String, String>>();
 
 		try {
@@ -167,7 +196,8 @@ public class DataManager implements IDataManager {
 				try {
 					credentialsFile.createNewFile();
 				} catch (IOException e) {
-					e.printStackTrace();
+					System.out.println("Credentials database could not be created."
+							+ "\nPossible fix: restart the program.");
 				}
 			}
 			Scanner sc;
@@ -206,7 +236,8 @@ public class DataManager implements IDataManager {
 			sc.close();
 
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Credentials database was not found."
+					+ "\nPossible fix: restart the program.");
 		}
 		setExistingCredentials(credentialsMap);
 	}
@@ -218,15 +249,90 @@ public class DataManager implements IDataManager {
 		setExistingUserIds(existingIds);
 	}
 	
-	// TODO:
-	
-	public final HashMap<Integer, HashMap<String, String>> modifyCredentialSet() {
+	public final void modifyCredentialSet(String friendlyName, String username, String password) {
+		File credentialsFile = new File(DOWNLOADS_PATH + "/credentials.txt");
+		String entireFile = "";
+		boolean foundCredentialSet = false;
+		
+		try {
+			boolean foundUser = true;
+			Scanner sc = new Scanner(credentialsFile);
+			String currentLine;
+			
+			while (sc.hasNextLine()) {
+				currentLine = sc.nextLine();
+				
+				if (currentLine.contains(Integer.toString(getSignedInUser())))
+					foundUser = true;
+				
+				if (foundUser && currentLine.contains(friendlyName + " : ")) {
+					foundCredentialSet = true;
+					entireFile += "-" + friendlyName + " : " + EncryptAndDecrypt.encryptData(username) + " " + EncryptAndDecrypt.encryptData(password) + "\n";
+					System.out.println("\n" + friendlyName + " was successfully modified.");
+					continue;
+				} else {
+					entireFile += currentLine;
+					entireFile += "\n";
+				}	
+			}
+			sc.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("An issue has occured when trying to modify this credential set.");
+		}
 
-		return null;
+		if (!foundCredentialSet) {
+			System.out.println("\nCredential set \"" + friendlyName + "\" was not found.");
+		} else {
+			try {
+				FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/credentials.txt");
+				writer.write(entireFile);
+				writer.close();
+			} catch (IOException e) {
+				System.out.println("An issue has occured when trying to update the credentials database.");
+			}
+		}
 	}
 
-	public final HashMap<Integer, HashMap<String, String>> deleteCredentialSet() {
+	public final void deleteCredentialSet(String friendlyName) {
+		File credentialsFile = new File(DOWNLOADS_PATH + "/credentials.txt");
+		String entireFile = "";
+		boolean foundCredentialSet = false;
+		
+		try {
+			boolean foundUser = true;
+			Scanner sc = new Scanner(credentialsFile);
+			String currentLine;
+			
+			while (sc.hasNextLine()) {
+				currentLine = sc.nextLine();
+				
+				if (currentLine.contains(Integer.toString(getSignedInUser())))
+					foundUser = true;
+				
+				if (foundUser && currentLine.contains(friendlyName + " : ")) {
+					foundCredentialSet = true;
+					System.out.println("\nCredential set \"" + friendlyName + "\" was deleted.");
+					continue;
+				} else {
+					entireFile += currentLine;
+					entireFile += "\n";
+				}	
+			}
+			sc.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("An issue has occured when trying to delete this credential set.");
+		}
 
-		return null;
+		if (!foundCredentialSet) {
+			System.out.println("\nCredential set \"" + friendlyName + "\" was not found.");
+		} else {
+			try {
+				FileWriter writer = new FileWriter(DOWNLOADS_PATH + "/credentials.txt");
+				writer.write(entireFile);
+				writer.close();
+			} catch (IOException e) {
+				System.out.println("An issue has occured when trying to update the credentials database.");
+			}
+		}
 	}
 }

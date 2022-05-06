@@ -3,6 +3,7 @@ package passwordManager;
 import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.HashMap;
 
 public class UserInputManager extends UserInteraction {
@@ -21,11 +22,13 @@ public class UserInputManager extends UserInteraction {
 		
 		System.out.println("Select from the following options:"
 				+ "\n[1] Create account"
-				+ "\n[2] Sign in");
+				+ "\n[2] Sign in"
+				+ "\n[3] Help"
+				+ "\n[4] Exit");
 
-		boolean exit = false;
+		boolean validSelection = false;
 
-		while (!exit) {
+		while (!validSelection) {
 			System.out.print("\nChoice: ");
 			int selection = handleIntInput();
 
@@ -33,11 +36,22 @@ public class UserInputManager extends UserInteraction {
 			case 1:
 				createUserAccount();
 				taskMenu();
-				exit = true;
+				validSelection = true;
 				break;
 			case 2:
 				signInProcedures();
-				exit = true;
+				validSelection = true;
+				break;
+			case 3:
+				programDescription();
+				Scanner sc = new Scanner(System.in);
+				sc.nextLine();
+				// clearScreen();
+				start(false);
+				break;
+			case 4:
+				System.out.print("\nProgram exited.");
+				validSelection = true;
 				break;
 			default:
 				System.out.println("\nInvalid input, please try again!");
@@ -65,7 +79,6 @@ public class UserInputManager extends UserInteraction {
 	}
 	
 	public final void taskMenu() {
-
 		boolean continueRequested = true;
 
 		while (continueRequested) {
@@ -88,17 +101,27 @@ public class UserInputManager extends UserInteraction {
 					validSelectionMade = true;
 					break;
 				case 2:
-					// TODO
-					System.out.println("Not yet implemented");
+					String caseTwoSelection = listAndSelectCredentials("delete");
+					if (!Objects.isNull(caseTwoSelection))
+						super.deleteCredentialSet(caseTwoSelection);
+					
 					validSelectionMade = true;
 					break;
 				case 3:
-					// TODO
-					System.out.println("Not yet implemented");
+					String caseThreeSelection = listAndSelectCredentials("modify");
+					if (!Objects.isNull(caseThreeSelection)) {
+						System.out.print("Set new username: ");
+						String username = sc.nextLine();
+						System.out.print("Set new password: ");
+						String password = sc.nextLine();
+						super.modifyCredentialSet(caseThreeSelection, username, password);
+					}
 					validSelectionMade = true;
 					break;
 				case 4:
-					listAndSelectCredentials();
+					String caseFourSelection = listAndSelectCredentials("access");
+					if (!Objects.isNull(caseFourSelection))
+						displayCredentials(caseFourSelection);
 					validSelectionMade = true;
 					break;
 				case 5:
@@ -124,10 +147,10 @@ public class UserInputManager extends UserInteraction {
 							continueRequested = false;
 							break;
 						} else {
-							System.out.println("Invalid input, please retry!");
+							System.out.println("\nInvalid input, please retry!");
 						}
 					} catch (StringIndexOutOfBoundsException e) {
-						System.out.println("Invalid input, please retry!");
+						System.out.println("\nInvalid input, please retry!");
 					}
 				}
 //				 super.clearScreen();
@@ -135,8 +158,6 @@ public class UserInputManager extends UserInteraction {
 			System.out.print("\nSee you soon, "
 					+ super.getExistingAccounts().get(getSignedInUser()).getName() + "!");
 		}
-	
-	// TODO: follow comments left below
 	
 	public final void handleCredentialSetCreation() {
 		sc = new Scanner(System.in);
@@ -175,7 +196,6 @@ public class UserInputManager extends UserInteraction {
 			int indexOfUsernameEnd = requestedCredentialSet.indexOf(" ");
 			
 			System.out.println("\nDisplaying selected credential set under " + friendlyName + ":");
-			
 			System.out.println("Username: " + EncryptAndDecrypt.decryptData(requestedCredentialSet.substring(0, indexOfUsernameEnd)));
 			System.out.println("Password: " + EncryptAndDecrypt.decryptData(requestedCredentialSet.substring(indexOfUsernameEnd + 1)));
 		}
@@ -184,21 +204,31 @@ public class UserInputManager extends UserInteraction {
 		}
 	}
 	
-	public final void listAndSelectCredentials() {
+	public final String listAndSelectCredentials(String action) {
 		super.readCredentialsFile();
 		HashMap<String, String> userOwnedCredentialsSet = super.getExistingCredentials().get(super.getSignedInUser());
 		
-		if (Objects.isNull(userOwnedCredentialsSet) || userOwnedCredentialsSet.isEmpty()) {
+		if (Objects.isNull(userOwnedCredentialsSet)) {
 			System.out.println("\nNo credential sets exist under this account!");
+			return null;
 		} else {
-			System.out.println("\nSelect the credential set you would like to access by typing the EXACT name:");
-			userOwnedCredentialsSet.forEach((key, value) -> System.out.println("-> " + key));
-			System.out.print("\nSelection: ");
+			Set<String> list = userOwnedCredentialsSet.keySet();
+			String listAsString = "";
 			
-			sc.nextLine(); // Consume rest of line
-			
-			String selection = sc.nextLine();
-			displayCredentials(selection);
+			for (String element : list)
+				listAsString += "-> " + element + "\n";
+
+			if (listAsString.length() < 1) {
+				System.out.println("\nNo credential sets exist under this account!");
+			} else {
+				System.out.println("\nSelect the credential set you would like to " + action + " by typing the EXACT name:");
+				System.out.println(listAsString);
+				System.out.print("Selection: ");
+				sc.nextLine(); // Consume rest of line
+				String selection = sc.nextLine();
+				return selection;
+			}
+			return null;
 		}
 	}
 
@@ -242,7 +272,7 @@ public class UserInputManager extends UserInteraction {
 				confirmedPw = sc.nextLine();
 
 				if (confirmedPw.equals(pw)) {
-					System.out.println("Success! Account created.\n");
+					System.out.println("\nSuccess! Account created.\n");
 //					super.clearScreen(); // TODO
 					meetsCriteria = true;
 					break;

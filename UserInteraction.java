@@ -22,19 +22,31 @@ public abstract class UserInteraction extends DataManager implements IUserIntera
      */
     public abstract void taskMenu();
     
-    /*
-     * See interface IUserInteraction for description
-     */
 	public final void clearScreen() {
 		// TODO
 		// Still need to find an implementation that does not leave an unknown character behind in the IDE
 	}
     
+	/*
+	 * Gives an explanation about what the program does and an example of how to use it
+	 */
+	public final void programDescription() {
+		System.out.println(
+			"\nThis program is a password manager."
+				+ "\n\nA password manager stores credential sets, which consist of the name of the account/program for which the sign-in"
+				+ "\ninformation is being saved, that account/program's corresponding username, and the corresponding password."
+				+ "\n\nFor example, if a credential set was made for Gmail, the credential set name would be \"Gmail\", and the username"
+				+ "\nand password would be the user's sign-in credentials."
+				+ "\n\nPress the \'ENTER\' key to continue...");
+	}
+	
     /*
      * Displays all friendly names of credential sets owned by the user
      * Asks user to select the Credentials set they would like to view
+     * @param action : lets the method have multiple purposes. Changes the prompt shown to the user
+     * @return String : the friendlyName of the user's selection
      */
-    public abstract void listAndSelectCredentials();
+    public abstract String listAndSelectCredentials(String action);
     
     /*
      * Displays requested credential set based on name of set (obtained by user-input)
