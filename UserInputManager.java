@@ -20,16 +20,16 @@ public class UserInputManager extends UserInteraction {
 		if (greet)
 			System.out.println("Welcome to the password manager\n");
 		
-		System.out.println("Select from the following options:"
+		boolean validSelection = false;
+
+		while (!validSelection) {
+			System.out.println("Select from the following options:"
 				+ "\n[1] Create account"
 				+ "\n[2] Sign in"
 				+ "\n[3] Help"
 				+ "\n[4] Exit");
-
-		boolean validSelection = false;
-
-		while (!validSelection) {
 			System.out.print("\nChoice: ");
+			
 			int selection = handleIntInput();
 
 			switch (selection) {
@@ -47,8 +47,7 @@ public class UserInputManager extends UserInteraction {
 				Scanner sc = new Scanner(System.in);
 				sc.nextLine();
 				// clearScreen();
-				start(false);
-				break;
+				continue;
 			case 4:
 				System.out.print("\nProgram exited.");
 				validSelection = true;
