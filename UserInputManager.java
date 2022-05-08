@@ -187,6 +187,7 @@ public class UserInputManager extends UserInteraction {
 			super.addCredentialSetToDB(super.getSignedInUser(), credentialSet);
 			System.out.println("\nCredential set added successfully!");
 		}
+		super.readCredentialsFile();
 	}
 	
 	public final void displayCredentials(String friendlyName) {
