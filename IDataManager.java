@@ -18,6 +18,7 @@ public interface IDataManager {
 	/*
 	 * Creates credentials.txt database if not already in existence
 	 * Writes Credentials object to database, links Credentials to the user ID (owner)
+	 * @param int userId, Credentials credentialSet
 	 */
 	public void addCredentialSetToDB(int userId, Credentials credentialSet);
 	
@@ -35,5 +36,15 @@ public interface IDataManager {
 	 */
 	public void retrieveAndSetUsedIds();
 	
-	// Add interface for modifyCredentialsSet() and deleteCredentialsSet()
+	/*
+	 * Updates the Credentials set corresponding to the passed friendly name
+	 * @param String friendlyName, String username, String password
+	 */
+	public void modifyCredentialSet(String friendlyName, String username, String password);
+	
+	/*
+	 * Deletes the Credentials set corresponding to the passed friendly name
+	 * @param String friendlyName
+	 */
+	public void deleteCredentialSet(String friendlyName);
 }
