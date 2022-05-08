@@ -3,12 +3,12 @@ package passwordManager;
 import java.io.IOException;
 
 public abstract class UserInteraction extends DataManager implements IUserInteraction {
-    
-	/*
-     * Beings interaction with user
+    /*
+     * Begins interaction with user
      * First thing to appear on screen
      * Includes greeting if the sign-in menu is being called for the first time
      * Asks user to set up account
+     * @param boolean greet
      */
     public abstract void start(boolean greet);
     
@@ -61,6 +61,7 @@ public abstract class UserInteraction extends DataManager implements IUserIntera
     
     /*
      * Displays requested credential set based on name of set (obtained by user-input)
+     * @param String friendlyName
      */
     public abstract void displayCredentials(String friendlyName); 
     
@@ -76,6 +77,7 @@ public abstract class UserInteraction extends DataManager implements IUserIntera
     
     /*
      * Handles exceptions that may arise while inputting into int-only fields
+     * @return int
      */
     public abstract int handleIntInput();
     
@@ -84,6 +86,7 @@ public abstract class UserInteraction extends DataManager implements IUserIntera
 	 * Passwords must be:
 	 * 8 characters or longer
 	 * Only contain characters with ASCII values 33-126
+	 * @return String
 	 */
     public abstract String handlePasswordCreation();
 }
