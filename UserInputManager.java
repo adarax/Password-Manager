@@ -323,6 +323,7 @@ public class UserInputManager extends UserInteraction {
 				System.out.println("Going back to start screen!\n");
 				start(false);
 			} else {
+				super.clearScreen();
 				taskMenu();
 			}
 		}
