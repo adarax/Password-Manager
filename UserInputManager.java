@@ -11,7 +11,9 @@ public class UserInputManager extends UserInteraction {
 	private static Scanner sc;
 	
 	public UserInputManager() {
-		// Imports database into HashMaps
+		super.clearScreen();
+
+		// Import database into HashMaps:
 		super.readAccountData();
 		super.readCredentialsFile();
 	}
@@ -46,7 +48,7 @@ public class UserInputManager extends UserInteraction {
 				programDescription();
 				Scanner sc = new Scanner(System.in);
 				sc.nextLine();
-				// clearScreen();
+				super.clearScreen();
 				continue;
 			case 4:
 				System.out.print("\nProgram exited.");
@@ -152,7 +154,7 @@ public class UserInputManager extends UserInteraction {
 						System.out.println("\nInvalid input, please retry!");
 					}
 				}
-//				 super.clearScreen();
+				 super.clearScreen();
 			}
 			System.out.print("\nSee you soon, "
 					+ super.getExistingAccounts().get(getSignedInUser()).getName() + "!");
@@ -272,7 +274,7 @@ public class UserInputManager extends UserInteraction {
 
 				if (confirmedPw.equals(pw)) {
 					System.out.println("\nSuccess! Account created.\n");
-//					super.clearScreen(); // TODO
+					super.clearScreen();
 					meetsCriteria = true;
 					break;
 				} else {

@@ -1,5 +1,7 @@
 package passwordManager;
 
+import java.io.IOException;
+
 public abstract class UserInteraction extends DataManager implements IUserInteraction {
     
 	/*
@@ -23,8 +25,17 @@ public abstract class UserInteraction extends DataManager implements IUserIntera
     public abstract void taskMenu();
     
 	public final void clearScreen() {
-		// TODO
-		// Still need to find an implementation that does not leave an unknown character behind in the IDE
+		try {
+			String currentOs = System.getProperty("os.name");
+			if (currentOs.toLowerCase().contains("win")) {
+				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+			} else {
+				System.out.print("\u001B[H\u001B[2J");
+				System.out.flush();
+			}
+		} catch (InterruptedException | IOException e) {
+			System.out.println("\nAn error occurred when clearing the screen.");
+		}
 	}
     
 	/*
