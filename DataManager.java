@@ -334,5 +334,6 @@ public class DataManager implements IDataManager {
 				System.out.println("An issue has occured when trying to update the credentials database.");
 			}
 		}
+		readCredentialsFile();
 	}
 }
