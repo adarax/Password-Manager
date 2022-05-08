@@ -6,5 +6,5 @@ public class Main {
 		UserInputManager inpmngr = new UserInputManager();
 		inpmngr.start(true);
 	}
-
+	
 }
