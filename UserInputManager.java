@@ -187,7 +187,6 @@ public class UserInputManager extends UserInteraction {
 			super.addCredentialSetToDB(super.getSignedInUser(), credentialSet);
 			System.out.println("\nCredential set added successfully!");
 		}
-		super.readCredentialsFile();
 	}
 	
 	public final void displayCredentials(String friendlyName) {
@@ -323,7 +322,6 @@ public class UserInputManager extends UserInteraction {
 				System.out.println("Going back to start screen!\n");
 				start(false);
 			} else {
-				super.clearScreen();
 				taskMenu();
 			}
 		}
