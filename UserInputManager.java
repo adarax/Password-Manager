@@ -313,7 +313,7 @@ public class UserInputManager extends UserInteraction {
 					continue;
 				} else {
 					super.setSignedInUser(userId);
-					System.out.println("\nWelcome, " + accountMap.get(userId).getName() + "!");
+					System.out.println("Welcome, " + accountMap.get(userId).getName() + "!");
 					break;
 				}
 			}
